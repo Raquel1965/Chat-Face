@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot con IA</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input, button { margin-top: 10px; padding: 10px; font-size: 16px; }
+        #respuesta { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Chatbot con IA (Hugging Face)</h1>
+    <input type="text" id="pregunta" placeholder="Escribe tu pregunta">
+    <button onclick="obtenerRespuesta()">Preguntar</button>
+    <p id="respuesta"></p>
+
+    <script>
+        async function obtenerRespuesta() {
+            const pregunta = document.getElementById("pregunta").value;
+            const respuestaElemento = document.getElementById("respuesta");
+
+            if (!pregunta.trim()) {
+                respuestaElemento.innerText = "Por favor, ingresa una pregunta.";
+                return;
+            }
+
+            respuestaElemento.innerText = "Pensando...";
+
+            const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct";
+            const headers = {
+                "Authorization": "Bearer TU_CLAVE_DE_HUGGING_FACE", 
+                "Content-Type": "application/json"
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({ inputs: pregunta })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    respuestaElemento.innerText = "Error: " + data.error;
+                } else {
+                    respuestaElemento.innerText = data[0].generated_text;
+                }
+            } catch (error) {
+                respuestaElemento.innerText = "Error al obtener respuesta.";
+            }
+        }
+    </script>
+</body>
+</html>
